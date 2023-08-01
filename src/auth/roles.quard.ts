@@ -7,18 +7,31 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    console.log('Roles Guard');
     const requiredRoles = this.reflector.getAllAndOverride<UsersRole[]>(
       'roles',
       [context.getHandler(), context.getClass()],
     );
+
     if (!requiredRoles) {
       return true;
     }
-    // No access to reguest user object added in AuthGuard
 
     const { user } = context.switchToHttp().getRequest();
-    console.log(requiredRoles);
-    console.log('RES', user);
+
+    return this.matchRoles(requiredRoles, user.role);
+  }
+  matchRoles(acceptedRoles: UsersRole[], userRole: UsersRole | UsersRole[]) {
+    if (typeof userRole === 'string') {
+      if (!acceptedRoles.includes(userRole)) {
+        return false;
+      }
+    }
+    if (typeof userRole === 'object') {
+      for (const role of acceptedRoles) {
+        if (!userRole.includes(role as UsersRole)) return false;
+      }
+    }
     return true;
   }
 }

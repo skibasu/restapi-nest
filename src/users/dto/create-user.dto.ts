@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -8,13 +7,15 @@ import {
   IsUrl,
   Length,
   Matches,
+  Validate,
 } from 'class-validator';
+import { IsArrayOfEnumsOrString } from '../validators/isArrayOfEnumsOrString.decorator';
 import { UsersRole } from '../types/users-types';
 
 export class CreateUserDto {
   @IsNotEmpty()
-  @IsIn([UsersRole.ADMIN, UsersRole.DRIVER, UsersRole.MANAGER])
-  role: UsersRole;
+  @Validate(IsArrayOfEnumsOrString)
+  role: UsersRole | UsersRole[];
 
   @IsString()
   @Length(2, 100)

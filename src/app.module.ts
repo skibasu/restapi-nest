@@ -4,6 +4,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/roles.quard';
+import { AuthGuard } from './auth/auth.guards';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './auth/constants';
 
 @Module({
   imports: [
@@ -12,12 +15,11 @@ import { RolesGuard } from './auth/roles.quard';
     ),
     AuthModule,
     UsersModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: 3600 },
+    }),
   ],
 })
 export class AppModule {}

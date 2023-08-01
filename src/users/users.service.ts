@@ -24,6 +24,13 @@ export class UsersService {
     return this.userModel.findOne({ email }).select('-__v').exec();
   }
 
+  async getUserByID(id: string): Promise<User> {
+    return this.userModel
+      .findById(id)
+      .select({ __v: 0, password: 0, salt: 0 })
+      .exec();
+  }
+
   async creatUser(user: Partial<User>) {
     const newUser = new this.userModel(user);
     const result = await newUser.save();
@@ -33,6 +40,19 @@ export class UsersService {
     }
     return result;
   }
+
+  async getListOfUsers(filterDto?: Partial<User>[]): Promise<User[]> {
+    const filters = filterDto && filterDto.length ? { $and: filterDto } : {};
+    const result = await this.userModel
+      .find(filters)
+      .select({ __v: 0, password: 0, salt: 0 })
+      .exec();
+    if (!result) {
+      throw new NotFoundException('There are no Users.');
+    }
+    return result;
+  }
+
   async checkIfUserIsUnique(
     user: Pick<User, 'email' | 'phoneNumber'>,
   ): Promise<{ conflict: boolean; message: string }> {

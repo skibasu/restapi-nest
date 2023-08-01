@@ -4,23 +4,28 @@ import {
   Get,
   Post,
   Request,
-  SetMetadata,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { User } from 'src/users/schema/user.schema';
 import { UsersRole } from 'src/users/types/users-types';
-import { AuthGuard } from './auth.guards';
+import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { UserCredentialsDto } from './dto/user-credentials.dto';
-import { Roles } from './roles.decorator';
+import { Roles } from './decorators/roles.decorator';
+import { Public } from './decorators/public.decorator';
+import { AuthGuard } from './auth.guards';
 import { RolesGuard } from './roles.quard';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService,
+  ) {}
+  @Public()
   @Post('/signin')
   @UsePipes(ValidationPipe)
   async signIn(@Body() userCredential: UserCredentialsDto): Promise<any> {
@@ -29,17 +34,16 @@ export class AuthController {
   }
 
   @Post('/signup')
+  @Roles(UsersRole.ADMIN)
   @UsePipes(ValidationPipe)
   async createUser(@Body() user: CreateUserDto) {
     return this.authService.signUp(user);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  // No access to reguest user object added in AuthGuard
-  @Get('/profile')
+  //@UseGuards(AuthGuard, RolesGuard)
   @Roles(UsersRole.ADMIN)
+  @Get('/profile')
   getProfile(@Request() req) {
-    console.log(req.user);
-    return req.user;
+    return this.usersService.getUserByID(req.user._id);
   }
 }
