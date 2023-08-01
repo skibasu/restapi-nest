@@ -53,6 +53,34 @@ export class UsersService {
     return result;
   }
 
+  async updateUser(_id: string, user: Partial<User>): Promise<User> {
+    let result;
+    try {
+      result = await this.userModel
+        .findOneAndUpdate({ _id }, user, {
+          returnOriginal: false,
+        })
+        .select({ __v: 0, password: 0, salt: 0 })
+        .exec();
+      return result;
+    } catch (error: any) {
+      throw new NotFoundException(`User with id: ${_id} not exist`);
+    }
+  }
+
+  async deleteUser(_id: string) {
+    try {
+      const result = await this.userModel.findOneAndDelete({ _id }).exec();
+
+      if (!result) {
+        throw new NotFoundException('User not exist');
+      }
+      return { status: 200, messege: `User ${_id} deleted` };
+    } catch (error: any) {
+      throw new NotFoundException('User not exist');
+    }
+  }
+
   async checkIfUserIsUnique(
     user: Pick<User, 'email' | 'phoneNumber'>,
   ): Promise<{ conflict: boolean; message: string }> {

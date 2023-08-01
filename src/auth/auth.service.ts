@@ -33,7 +33,7 @@ export class AuthService {
       role: user.role,
     };
 
-    if (await bcrypt.compare(password, hash))
+    if (hash === user.password)
       return {
         _id: user._id,
         token: await this.jwtService.signAsync(payload),
