@@ -16,6 +16,7 @@ import { AuthGuard } from './auth.guards';
 import { AuthService } from './auth.service';
 import { UserCredentialsDto } from './dto/user-credentials.dto';
 import { Roles } from './roles.decorator';
+import { RolesGuard } from './roles.quard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,9 +34,10 @@ export class AuthController {
     return this.authService.signUp(user);
   }
 
-  @UseGuards(AuthGuard)
-  //@Roles(UsersRole.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  // No access to reguest user object added in AuthGuard
   @Get('/profile')
+  @Roles(UsersRole.ADMIN)
   getProfile(@Request() req) {
     console.log(req.user);
     return req.user;
