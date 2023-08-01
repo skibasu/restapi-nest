@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { UsersRole } from '../types/users-types';
-import { Mongoose } from 'mongoose';
 
 @Schema()
 export class User {
@@ -51,6 +50,7 @@ export class User {
   @Prop({
     type: String,
     required: true,
+    matches: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
   })
   salt: string;
 }

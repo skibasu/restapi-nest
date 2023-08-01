@@ -2,11 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './auth/roles.quard';
-import { AuthGuard } from './auth/auth.guards';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './auth/constants';
+import { jwtConstants } from './auth/constants/constants';
 
 @Module({
   imports: [
