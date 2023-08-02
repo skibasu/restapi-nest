@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Post,
   UsePipes,
   ValidationPipe,
@@ -14,6 +16,7 @@ import { Public } from './decorators/public.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+  @HttpCode(200)
   @Public()
   @Post('/signin')
   @UsePipes(ValidationPipe)
