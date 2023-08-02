@@ -21,7 +21,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  @Roles(UsersRole.ADMIN)
+  @Roles(UsersRole.ADMIN, UsersRole.MANAGER)
   async getListOfUsers(
     @Query(ValidationPipe) filterDto: GetUsersFilterDto,
   ): Promise<User[]> {
