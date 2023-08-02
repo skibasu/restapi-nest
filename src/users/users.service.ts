@@ -63,7 +63,6 @@ export class UsersService {
         email: user?.email,
         phoneNumber: user?.phoneNumber,
       });
-      console.log(conflict);
       if (conflict) throw new ConflictException(message);
     }
 

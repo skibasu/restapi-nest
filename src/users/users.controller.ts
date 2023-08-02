@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
+import { PatchProfileDto } from './dto/patch-profile.dto';
+import { PatchUserDto } from './dto/patch-user.dto';
 import { UserIdDto } from './dto/user-id.dto';
 import { User } from './schema/user.schema';
 import { UsersRole } from './types/users-types';
@@ -34,23 +36,23 @@ export class UsersController {
   }
 
   @Get('/profile')
-  getUserProfile(
-    @Request() req,
-    @Body(ValidationPipe) user: GetUsersFilterDto,
-  ) {
-    return this.usersService.updateUser(req.user._id, user);
+  getUserProfile(@Request() req) {
+    return this.usersService.getUserByID(req.user._id);
   }
 
   @Patch('/profile')
-  updateUserProfile(@Request() req) {
-    return this.usersService.getUserByID(req.user._id);
+  updateUserProfile(
+    @Request() req,
+    @Body(ValidationPipe) user: PatchProfileDto,
+  ) {
+    return this.usersService.updateUser(req.user._id, user);
   }
 
   @Patch('/:id')
   @Roles(UsersRole.ADMIN, UsersRole.MANAGER)
   async updateUserByID(
     @Param(ValidationPipe) params: UserIdDto,
-    @Body(ValidationPipe) user: GetUsersFilterDto,
+    @Body(ValidationPipe) user: PatchUserDto,
   ) {
     console.log('update users');
     return this.usersService.updateUser(params.id, user);
