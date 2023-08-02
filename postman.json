@@ -11,7 +11,23 @@
       "item": [
         {
           "name": "signin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "console.log(pm.collectionVariables)",
+                  "pm.collectionVariables.set('TOKEN', res.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -24,9 +40,8 @@
               }
             },
             "url": {
-              "raw": "46.41.141.83:3000/auth/signin",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/auth/signin",
+              "host": ["{{URL}}"],
               "path": ["auth", "signin"]
             }
           },
@@ -35,12 +50,30 @@
         {
           "name": "signup",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "46.41.141.83:3000/auth/signup",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/auth/signup",
+              "host": ["{{URL}}"],
               "path": ["auth", "signup"]
             }
           },
@@ -54,12 +87,21 @@
         {
           "name": "getUsers",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "46.41.141.83:3000/users",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/users",
+              "host": ["{{URL}}"],
               "path": ["users"]
             }
           },
@@ -68,12 +110,21 @@
         {
           "name": "getProfile",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "46.41.141.83:3000/users/profile",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/users/profile",
+              "host": ["{{URL}}"],
               "path": ["users", "profile"]
             }
           },
@@ -82,12 +133,21 @@
         {
           "name": "updateUser",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "46.41.141.83:3000/users/:id",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/users/:id",
+              "host": ["{{URL}}"],
               "path": ["users", ":id"],
               "variable": [
                 {
@@ -102,12 +162,21 @@
         {
           "name": "updateProfile",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "46.41.141.83:3000/users/profile",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/users/profile",
+              "host": ["{{URL}}"],
               "path": ["users", "profile"]
             }
           },
@@ -116,12 +185,21 @@
         {
           "name": "deleteUser",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "46.41.141.83:3000/users/:id",
-              "host": ["46", "41", "141", "83"],
-              "port": "3000",
+              "raw": "{{URL}}/users/:id",
+              "host": ["{{URL}}"],
               "path": ["users", ":id"],
               "variable": [
                 {
@@ -134,6 +212,34 @@
           "response": []
         }
       ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "URL",
+      "value": "46.41.141.83:3000",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
     }
   ]
 }
