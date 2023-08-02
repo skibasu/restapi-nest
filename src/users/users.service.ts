@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
@@ -54,6 +58,15 @@ export class UsersService {
   }
 
   async updateUser(_id: string, user: Partial<User>): Promise<User> {
+    if (user?.email || user?.phoneNumber) {
+      const { conflict, message } = await this.checkIfUserIsUnique({
+        email: user?.email,
+        phoneNumber: user?.phoneNumber,
+      });
+      console.log(conflict);
+      if (conflict) throw new ConflictException(message);
+    }
+
     let result;
     try {
       result = await this.userModel

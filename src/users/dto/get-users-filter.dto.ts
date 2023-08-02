@@ -1,4 +1,11 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 import { UsersRole } from '../types/users-types';
 
 export class GetUsersFilterDto {
@@ -7,11 +14,13 @@ export class GetUsersFilterDto {
   role: UsersRole;
 
   @IsOptional()
-  @IsNotEmpty()
+  @IsString()
+  @Length(2, 100)
   firstName: string;
 
   @IsOptional()
-  @IsNotEmpty()
+  @IsString()
+  @Length(2, 100)
   lastName: string;
 
   @IsOptional()
