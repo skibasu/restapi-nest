@@ -54,7 +54,6 @@ export class UsersController {
     @Param(ValidationPipe) params: UserIdDto,
     @Body(ValidationPipe) user: PatchUserDto,
   ) {
-    console.log('update users');
     return this.usersService.updateUser(params.id, user);
   }
 
