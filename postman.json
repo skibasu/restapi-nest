@@ -1,0 +1,139 @@
+{
+  "info": {
+    "_postman_id": "d95b161b-51f0-423c-95a6-eb55faa2b568",
+    "name": "DeliverBook",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "13067153"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "signin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin@admin.com\", \"password\":\"Admin1!_\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "46.41.141.83:3000/auth/signin",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["auth", "signin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "46.41.141.83:3000/auth/signup",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["auth", "signup"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "getUsers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "46.41.141.83:3000/users",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getProfile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "46.41.141.83:3000/users/profile",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateUser",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "46.41.141.83:3000/users/:id",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateProfile",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "46.41.141.83:3000/users/profile",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteUser",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "46.41.141.83:3000/users/:id",
+              "host": ["46", "41", "141", "83"],
+              "port": "3000",
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
