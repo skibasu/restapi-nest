@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { UserCredentialsDto } from './dto/user-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
-
+const message = 'Bad credentials';
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,7 +24,7 @@ export class AuthService {
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(message);
     }
     const hash = await bcrypt.hash(password, user.salt);
     const payload = {
@@ -38,7 +38,7 @@ export class AuthService {
         _id: user._id,
         token: await this.jwtService.signAsync(payload),
       };
-    throw new UnauthorizedException();
+    throw new UnauthorizedException(message);
   }
 
   async signUp(user: Partial<User>): Promise<{ message: string }> {
