@@ -25,7 +25,7 @@ export class AuthController {
   }
 
   @Post('/signup')
-  @Roles(UsersRole.ADMIN)
+  @Roles(UsersRole.ADMIN, UsersRole.MANAGER)
   @UsePipes(ValidationPipe)
   async createUser(@Body() user: CreateUserDto) {
     return this.authService.signUp(user);
