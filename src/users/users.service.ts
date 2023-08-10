@@ -51,8 +51,8 @@ export class UsersService {
       .find(filters)
       .select({ __v: 0, password: 0, salt: 0 })
       .exec();
-    if (!result) {
-      throw new NotFoundException('There are no Users.');
+    if (result.length === 0 || !result) {
+      throw new NotFoundException('Not found.');
     }
     return result;
   }
