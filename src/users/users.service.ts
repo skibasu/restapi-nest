@@ -13,7 +13,7 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async getUsers(filterDto?: Partial<GetUsersFilterDto>[]): Promise<User[]> {
-    const filters = filterDto && filterDto.length ? { $and: filterDto } : {};
+    const filters = filterDto && filterDto.length ? { $and: filterDto } : [];
 
     const result = await this.userModel.find(filters).select('-__v').exec();
 

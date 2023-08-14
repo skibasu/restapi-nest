@@ -5,13 +5,15 @@ import {
   IsOptional,
   IsString,
   Length,
+  Matches,
 } from 'class-validator';
 import { UsersRole } from '../types/users-types';
-
+const regex = /ADMIN|MANAGER|DRIVER/i;
 export class GetUsersFilterDto {
   @IsOptional()
   @IsNotEmpty()
-  @IsIn([UsersRole.ADMIN, UsersRole.DRIVER, UsersRole.MANAGER])
+  @Matches(regex)
+  //   @IsIn([UsersRole.ADMIN, UsersRole.DRIVER, UsersRole.MANAGER])
   role: UsersRole;
 
   @IsOptional()
