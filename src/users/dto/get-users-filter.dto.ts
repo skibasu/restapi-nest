@@ -1,19 +1,18 @@
 import {
   IsEmail,
-  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
   Length,
-  Matches,
+  Validate,
 } from 'class-validator';
 import { UsersRole } from '../types/users-types';
-const regex = /ADMIN|MANAGER|DRIVER/i;
+import { IsArrayOfEnumsOrString } from '../validators/isArrayOfEnumsOrString.decorator';
+
 export class GetUsersFilterDto {
   @IsOptional()
   @IsNotEmpty()
-  @Matches(regex)
-  //   @IsIn([UsersRole.ADMIN, UsersRole.DRIVER, UsersRole.MANAGER])
+  @Validate(IsArrayOfEnumsOrString)
   role: UsersRole;
 
   @IsOptional()

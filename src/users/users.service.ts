@@ -5,24 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { User } from './schema/user.schema';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-
-  async getUsers(filterDto?: Partial<GetUsersFilterDto>[]): Promise<User[]> {
-    const filters = filterDto && filterDto.length ? { $and: filterDto } : [];
-
-    const result = await this.userModel.find(filters).select('-__v').exec();
-
-    if (!result) {
-      throw new NotFoundException('There are no Users, yet');
-    }
-
-    return result;
-  }
 
   async getUserByEmail(email: string): Promise<User> {
     return this.userModel.findOne({ email }).select('-__v').exec();
