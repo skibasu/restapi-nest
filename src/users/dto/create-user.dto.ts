@@ -7,6 +7,7 @@ import {
   IsUrl,
   Length,
   Matches,
+  NotContains,
   Validate,
 } from 'class-validator';
 import { IsArrayOfEnumsOrString } from '../validators/isArrayOfEnumsOrString.decorator';
@@ -18,11 +19,15 @@ export class CreateUserDto {
   role: UsersRole | UsersRole[];
 
   @IsString()
+  @NotContains(' ', { message: 'Spaces are not allowed.' })
   @Length(2, 100)
   firstName: string;
 
   @IsString()
   @Length(2, 100)
+  @Matches(/^[^\s]+(\s+[^\s]+)*$/, {
+    message: 'Spaces on the beginning and on the end are not allowed.',
+  })
   lastName: string;
 
   @IsNotEmpty()

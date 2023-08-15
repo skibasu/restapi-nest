@@ -29,7 +29,7 @@ export class UsersController {
   ): Promise<User[]> {
     const filters = filterDto
       ? Object.keys(filterDto).map((key) => ({
-          [key]: filterDto[key],
+          [key]: { $regex: filterDto[key], $options: 'i' },
         }))
       : [];
     return this.usersService.getListOfUsers(filters);

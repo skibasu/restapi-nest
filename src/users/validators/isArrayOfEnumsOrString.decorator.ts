@@ -12,12 +12,15 @@ export class IsArrayOfEnumsOrString implements ValidatorConstraintInterface {
     }
     if (typeof v === 'object' && v.length > 0) {
       v.forEach((element) => {
-        if (!Object.keys(UsersRole).includes(element)) {
+        if (!Object.keys(UsersRole).includes(element.toUpperCase())) {
           return false;
         }
       });
     }
-    if (typeof v === 'string' && !Object.keys(UsersRole).includes(v)) {
+    if (
+      typeof v === 'string' &&
+      !Object.keys(UsersRole).includes(v.toUpperCase())
+    ) {
       return false;
     }
     return true;

@@ -9,6 +9,8 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { UserCredentialsDto } from './dto/user-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
+import { roleToUpperCase } from 'src/users/helpers/helpers';
+
 const message = 'Bad credentials';
 @Injectable()
 export class AuthService {
@@ -51,7 +53,7 @@ export class AuthService {
 
     user.salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(password, user.salt);
-
+    user.role = roleToUpperCase(user.role);
     const result = await this.usersService.creatUser(user);
 
     if (!result) {
