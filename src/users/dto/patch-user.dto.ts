@@ -9,12 +9,14 @@ import {
   Length,
   Matches,
   NotContains,
+  Validate,
 } from 'class-validator';
 import { UsersRole } from '../types/users-types';
+import { IsArrayOfEnumsOrString } from '../validators/isArrayOfEnumsOrString.decorator';
 
 export class PatchUserDto {
   @IsOptional()
-  @IsIn([UsersRole.ADMIN, UsersRole.DRIVER, UsersRole.MANAGER])
+  @Validate(IsArrayOfEnumsOrString)
   role: UsersRole | UsersRole[];
 
   @IsOptional()
