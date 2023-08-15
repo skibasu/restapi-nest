@@ -13,7 +13,7 @@ import { UsersRole } from '../types/users-types';
 export class PatchUserDto {
   @IsOptional()
   @IsIn([UsersRole.ADMIN, UsersRole.DRIVER, UsersRole.MANAGER])
-  role: UsersRole;
+  role: UsersRole | UsersRole[];
 
   @IsOptional()
   @IsString()

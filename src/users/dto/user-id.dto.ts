@@ -1,6 +1,6 @@
-import { IsMongoId } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class UserIdDto {
-  @IsMongoId()
+  @IsString()
   id: string;
 }
