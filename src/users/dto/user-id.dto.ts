@@ -1,6 +1,6 @@
-import { IsMongoId, IsString } from 'class-validator';
-
+import { IsMongoId } from 'class-validator';
+//fixed
 export class UserIdDto {
-  @IsString()
+  @IsMongoId()
   id: string;
 }
