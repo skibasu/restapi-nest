@@ -22,6 +22,9 @@ export class CreateOrderDto {
   @IsString()
   paymentType: PaymentType;
   @IsOptional()
-  @IsIn([OrderStatus.DRAFT, OrderStatus.OPEN])
-  status: OrderStatus.DRAFT | OrderStatus.OPEN;
+  @IsString()
+  selectedBy: string;
+  @IsOptional()
+  @IsIn([OrderStatus.DRAFT, OrderStatus.OPEN, OrderStatus.SELECTED])
+  status: OrderStatus.DRAFT | OrderStatus.OPEN | OrderStatus.SELECTED;
 }

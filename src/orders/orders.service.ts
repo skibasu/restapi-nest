@@ -45,24 +45,36 @@ export class OrdersService {
     }
   }
   async createOrder(order: CreateOrderDto, user: any): Promise<Order> {
+    const { status, selectedBy } = order;
     try {
-      const isAccepted = matchRoles(
-        [UsersRole.ADMIN, UsersRole.MANAGER],
-        user.role,
-      );
+      const isAccepted =
+        matchRoles([UsersRole.ADMIN, UsersRole.MANAGER], user.role) &&
+        status !== OrderStatus.DRAFT;
 
       const addedBy = user._id;
-      const status = isAccepted
-        ? order.status || OrderStatus.OPEN
-        : OrderStatus.DRAFT;
+
+      const selectedFor =
+        selectedBy && isAccepted ? { selectedBy: order.selectedBy } : {};
+
+      let orderStatus;
+
+      if (isAccepted && selectedBy) {
+        orderStatus = OrderStatus.SELECTED;
+      } else if (isAccepted && !selectedBy) {
+        orderStatus = OrderStatus.OPEN;
+      } else if (!isAccepted) {
+        orderStatus = OrderStatus.DRAFT;
+      }
+
       const acceptedBy = isAccepted ? { acceptedBy: addedBy } : {};
       const newOrder = new this.orderModel({
         ...order,
         ...acceptedBy,
+        ...selectedFor,
 
         isAccepted,
         addedBy,
-        status,
+        status: orderStatus,
       });
 
       const result = await newOrder.save();
