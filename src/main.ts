@@ -33,5 +33,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.listen(3000);
+  const url = await app.getUrl();
+  console.log(`Application running at ${url}`);
 }
 bootstrap();
