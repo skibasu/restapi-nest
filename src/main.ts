@@ -5,9 +5,14 @@ import { AppModule } from './app.module';
 import { AuthGuard } from './auth/quards/auth.guards';
 import { RolesGuard } from './auth/quards/roles.quard';
 import { HttpExceptionFilter } from './filters/http-exceptions.filter';
+import fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('./secrets/private-key.pem'),
+    cert: fs.readFileSync('./secrets/public-certificate.pem'),
+  };
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   app.enableCors({
     origin: '*',
   });
