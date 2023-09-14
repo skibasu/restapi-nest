@@ -6,10 +6,14 @@ import { AppModule } from './app.module';
 import { AuthGuard } from './auth/quards/auth.guards';
 import { RolesGuard } from './auth/quards/roles.quard';
 import { HttpExceptionFilter } from './filters/http-exceptions.filter';
-import { SocketIOAdapter } from './socket-io-adapter';
+import * as fs from 'node:fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync(process.cwd() + '/secret/private-key.pem'),
+    cert: fs.readFileSync(process.cwd() + '/secret/public-certificate.pem'),
+  };
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   app.enableCors({
     origin: '*',
   });
@@ -32,6 +36,12 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
 
+<<<<<<< HEAD
   await app.listen(PORT);
+=======
+  await app.listen(3000);
+  const url = await app.getUrl();
+  console.log(`Application running at ${url}`);
+>>>>>>> main
 }
 bootstrap();
