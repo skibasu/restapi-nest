@@ -7,6 +7,7 @@ import { AuthGuard } from './auth/quards/auth.guards';
 import { RolesGuard } from './auth/quards/roles.quard';
 import { HttpExceptionFilter } from './filters/http-exceptions.filter';
 import * as fs from 'node:fs';
+import { SocketIOAdapter } from './socket-io-adapter';
 
 async function bootstrap() {
   const httpsOptions = {
