@@ -36,12 +36,6 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
 
-<<<<<<< HEAD
   await app.listen(PORT);
-=======
-  await app.listen(3000);
-  const url = await app.getUrl();
-  console.log(`Application running at ${url}`);
->>>>>>> main
 }
 bootstrap();
