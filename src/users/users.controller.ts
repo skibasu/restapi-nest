@@ -36,12 +36,12 @@ export class UsersController {
   }
 
   @Get('/profile')
-  getUserProfile(@Request() req) {
+  async getUserProfile(@Request() req) {
     return this.usersService.getUserByID(req.user._id);
   }
 
   @Patch('/profile')
-  updateUserProfile(
+  async updateUserProfile(
     @Request() req,
     @Body(ValidationPipe) user: PatchProfileDto,
   ) {

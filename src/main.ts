@@ -1,4 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { AppModule } from './app.module';
@@ -25,15 +26,22 @@ async function bootstrap() {
 
   const reflector = app.get(Reflector);
   const jwtService = app.get(JwtService);
+  const configService = app.get(ConfigService);
+  const PORT = configService.get('PORT');
 
+  app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
   app.useGlobalGuards(
     new AuthGuard(jwtService, reflector),
     new RolesGuard(reflector),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
 
+<<<<<<< HEAD
+  await app.listen(PORT);
+=======
   await app.listen(3000);
   const url = await app.getUrl();
   console.log(`Application running at ${url}`);
+>>>>>>> main
 }
 bootstrap();
