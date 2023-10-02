@@ -12,3 +12,5 @@ export enum OrderStatus {
   DONE = 'DONE',
   SELECTED = 'SELECTED',
 }
+
+export type Products = string[];

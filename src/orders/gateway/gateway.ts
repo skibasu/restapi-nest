@@ -26,7 +26,7 @@ enum ActionMesseges {
 }
 
 @UsePipes(ValidationPipe)
-@WebSocketGateway({ namespace: 'orders' })
+@WebSocketGateway({ namespace: 'orders', cors: true, origin: '*' })
 export class Gateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -102,7 +102,7 @@ export class Gateway
     if (
       matchRoles([UsersRole.ADMIN, UsersRole.MANAGER], role) &&
       selectedBy &&
-      selectedBy !== userId
+      selectedBy._id !== userId
     ) {
       this.io
         .to(`${status}_${selectedBy}`)
@@ -126,6 +126,7 @@ export class Gateway
     @MessageBody(ValidationPipe) data: CreateOrderDto,
     @ConnectedSocket() client: Socket & WsUser,
   ) {
+    console.log('CREATE ORDER');
     const { role } = client.user;
     const { selectedBy } = data;
     const result = await this.ordersService.createOrder(data, client.user);
