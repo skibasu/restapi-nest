@@ -10,11 +10,11 @@ import * as fs from 'node:fs';
 import { SocketIOAdapter } from './socket-io-adapter';
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync(process.cwd() + '/secret/private-key.pem'),
-    cert: fs.readFileSync(process.cwd() + '/secret/public-certificate.pem'),
-  };
-  const app = await NestFactory.create(AppModule, { httpsOptions });
+  //   const httpsOptions = {
+  //     key: fs.readFileSync(process.cwd() + '/secret/private-key.pem'),
+  //     cert: fs.readFileSync(process.cwd() + '/secret/public-certificate.pem'),
+  //   };
+  const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: '*',
   });

@@ -1,20 +1,41 @@
 // import { IsEmail, IsOptional, IsString } from 'class-validator';
-import { IsIn, IsMongoId, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsMongoId,
+  IsObject,
+  IsOptional,
+  IsString,
+  Validate,
+} from 'class-validator';
+import { IsMongoIdOrNull } from 'src/users/validators/isMongoIdOrNull';
 import { OrderStatus, PaymentType } from '../types/orders.types';
-
+class PatchOrderDtoAdress {
+  @IsOptional()
+  streetName: string;
+  @IsOptional()
+  houseNumber: string;
+  @IsOptional()
+  flatNumber: string;
+  @IsOptional()
+  city: string;
+}
 export class PatchOrderDto {
   @IsOptional()
   @IsString()
   title: string;
   @IsOptional()
-  @IsString()
-  streetName: string;
+  @IsObject()
+  adress: PatchOrderDtoAdress;
   @IsOptional()
   @IsString()
-  houseNumber: string;
+  phoneNumber: string;
   @IsOptional()
-  @IsString()
-  flatNumber: string;
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  products: string[];
   @IsOptional()
   @IsString()
   price: string;
@@ -22,14 +43,11 @@ export class PatchOrderDto {
   @IsString()
   paymentType: PaymentType;
   @IsOptional()
-  @IsIn([
-    OrderStatus.DRAFT,
-    OrderStatus.OPEN,
-    OrderStatus.PENDING,
-    OrderStatus.SELECTED,
-    OrderStatus.DONE,
-  ])
+  @IsEnum(OrderStatus)
   status: OrderStatus;
+  @IsOptional()
+  @Validate(IsMongoIdOrNull)
+  selectedBy: string;
 }
 
 export class WSPatchOrderDto {
@@ -39,14 +57,16 @@ export class WSPatchOrderDto {
   @IsString()
   title: string;
   @IsOptional()
-  @IsString()
-  streetName: string;
+  @IsObject()
+  adress: PatchOrderDtoAdress;
   @IsOptional()
   @IsString()
-  houseNumber: string;
+  phoneNumber: string;
   @IsOptional()
-  @IsString()
-  flatNumber: string;
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  products: string[];
   @IsOptional()
   @IsString()
   price: string;
@@ -54,12 +74,9 @@ export class WSPatchOrderDto {
   @IsString()
   paymentType: PaymentType;
   @IsOptional()
-  @IsIn([
-    OrderStatus.DRAFT,
-    OrderStatus.OPEN,
-    OrderStatus.PENDING,
-    OrderStatus.SELECTED,
-    OrderStatus.DONE,
-  ])
+  @IsEnum(OrderStatus)
   status: OrderStatus;
+  @IsOptional()
+  @Validate(IsMongoIdOrNull)
+  selectedBy: string;
 }

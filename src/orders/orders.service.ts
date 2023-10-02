@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -23,12 +24,17 @@ export class OrdersService {
       const result = await this.orderModel
         .find(filters)
         .select({ __v: 0 })
+        .populate({
+          path: 'selectedBy addedBy acceptedBy',
+          select: ['firstName', 'lastName', 'avatar', 'phoneNumber', 'role'],
+        })
         .exec();
       if (result.length === 0 || !result) {
         throw new NotFoundException('Not found.');
       }
       return result;
-    } catch {
+    } catch (e: any) {
+      Logger.log(e);
       throw new InternalServerErrorException();
     }
   }
@@ -38,6 +44,10 @@ export class OrdersService {
       const result = await this.orderModel
         .find({ selectedBy: userId })
         .select({ __v: 0 })
+        .populate({
+          path: 'selectedBy addedBy acceptedBy',
+          select: ['firstName', 'lastName', 'avatar', 'phoneNumber', 'role'],
+        })
         .exec();
       return result;
     } catch (error: any) {
@@ -82,8 +92,13 @@ export class OrdersService {
       if (!result) {
         throw new NotFoundException('Order not saved');
       }
-      return result;
-    } catch {
+
+      return await result.populate({
+        path: 'selectedBy addedBy acceptedBy',
+        select: ['firstName', 'lastName', 'avatar', 'phoneNumber', 'role'],
+      });
+    } catch (e) {
+      console.log(e);
       throw new InternalServerErrorException();
     }
   }
@@ -96,6 +111,10 @@ export class OrdersService {
           returnOriginal: false,
         })
         .select({ __v: 0 })
+        .populate({
+          path: 'selectedBy addedBy acceptedBy',
+          select: ['firstName', 'lastName', 'avatar', 'phoneNumber', 'role'],
+        })
         .exec();
       return result;
     } catch (error: any) {

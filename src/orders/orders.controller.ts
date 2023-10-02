@@ -28,11 +28,11 @@ export class OrdersController {
   async getListOfOrders(
     @Query(ValidationPipe) filterDto: GetOrdersFilterDto,
   ): Promise<Order[]> {
-    const filters = filterDto
-      ? Object.keys(filterDto).map((key) => ({
-          [key]: { $regex: filterDto[key], $options: 'i' },
-        }))
-      : [];
+    const filters = [{}];
+    //    ? Object.keys(filterDto).map((key) => ({
+    //        [key]: { $regex: filterDto[key], $options: 'i' },
+    //      }))
+    //    : [];
     return this.ordersService.getListOfOrders(filters);
   }
 
