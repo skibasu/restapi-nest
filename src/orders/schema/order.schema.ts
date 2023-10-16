@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { OrderStatus, PaymentType, Products } from '../types/orders.types';
+import {
+  MenuProductType,
+  OrderStatus,
+  PaymentType,
+} from '../types/orders.types';
 import { User } from 'src/users/schema/user.schema';
 
 @Schema()
@@ -21,6 +25,22 @@ export class Actions {
   editable: boolean;
   deletable: boolean;
 }
+export class Product {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
+  _id: string;
+  @Prop({ type: String, required: true })
+  title: string;
+  @Prop({ type: Number, required: true })
+  price: number;
+  @Prop({ type: String, required: true })
+  description: string;
+  @Prop({ type: String, required: true })
+  picture: string;
+  @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
+  type: MenuProductType;
+  @Prop({ type: Number, required: true })
+  counter: number;
+}
 
 @Schema()
 export class Order {
@@ -38,7 +58,7 @@ export class Order {
   @Prop({ type: String, required: true })
   title: string;
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
-  products: Products;
+  products: Product[];
   @Prop({ type: String, required: true })
   phoneNumber: string;
   @Prop({ type: String, required: true })

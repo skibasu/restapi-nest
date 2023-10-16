@@ -35,7 +35,11 @@ export class OrdersService {
       return result;
     } catch (e: any) {
       Logger.log(e);
-      throw new InternalServerErrorException();
+      if (e.response.statusCode === 404) {
+        throw new NotFoundException('Not found.');
+      } else {
+        throw new InternalServerErrorException();
+      }
     }
   }
 

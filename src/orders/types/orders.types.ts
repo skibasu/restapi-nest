@@ -13,4 +13,18 @@ export enum OrderStatus {
   SELECTED = 'SELECTED',
 }
 
-export type Products = string[];
+export enum MenuProductType {
+  PIZZA = 'PIZZA',
+  DRINKS = 'DRINKS',
+  OTHERS = 'OTHERS',
+}
+
+export interface Product {
+  _id: string;
+  title: string;
+  price: number;
+  description: string;
+  picture: string;
+  type: MenuProductType;
+  counter: number;
+}
