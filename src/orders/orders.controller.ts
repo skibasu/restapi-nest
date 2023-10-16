@@ -59,6 +59,7 @@ export class OrdersController {
   ) {
     return this.ordersService.updateOrder(params.id, order);
   }
+  @Roles(UsersRole.ADMIN, UsersRole.MANAGER)
   @Delete('/:id')
   async deleteOrder(@Param(ValidationPipe) params: OrderIdDto) {
     return this.ordersService.deleteOrder(params.id);

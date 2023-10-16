@@ -81,6 +81,7 @@ export class OrdersService {
       }
 
       const acceptedBy = isAccepted ? { acceptedBy: addedBy } : {};
+      const createdAt = new Date().getTime();
       const newOrder = new this.orderModel({
         ...order,
         ...acceptedBy,
@@ -89,6 +90,7 @@ export class OrdersService {
         isAccepted,
         addedBy,
         status: orderStatus,
+        createdAt,
       });
 
       const result = await newOrder.save();
@@ -125,14 +127,26 @@ export class OrdersService {
       throw new NotFoundException(`Order with id: ${_id} not exist`);
     }
   }
-  async deleteOrder(_id: string): Promise<{ status: number; message: string }> {
+  async deleteOrder(_id: string): Promise<{
+    status: number;
+    message: string;
+    deleted: Pick<Order, '_id' | 'status' | 'selectedBy'>;
+  }> {
     try {
       const result = await this.orderModel.findOneAndDelete({ _id }).exec();
 
       if (!result) {
         throw new NotFoundException('Order not exist');
       }
-      return { status: 200, message: `Order ${_id} deleted` };
+      return {
+        status: 200,
+        message: `Order ${_id} deleted`,
+        deleted: {
+          _id: result._id,
+          status: result.status,
+          selectedBy: result.selectedBy,
+        },
+      };
     } catch (error: any) {
       throw new NotFoundException('Order not exist');
     }
