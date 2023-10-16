@@ -18,10 +18,12 @@ import { WSPatchOrderDto } from '../dto/patch-order-dto';
 import { matchRoles } from 'src/auth/quards/helpers/helpers';
 import { UsersRole } from 'src/users/types/users-types';
 import { OrderStatus } from '../types/orders.types';
+import { DeleteOrderDto } from '../dto/delete-order-dto';
 
 enum ActionMesseges {
   CREATE_ORDER = 'createOrder',
   UPDATE_ORDER = 'updateOrder',
+  DELETE_ORDER = 'deleteOrder',
   JOIN_ROOM = 'joinRoom',
 }
 
@@ -36,15 +38,13 @@ export class Gateway
 
   constructor(private readonly ordersService: OrdersService) {}
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.log('Init GATEWAY');
   }
 
   async handleConnection(client: Socket & WsUser, ...args: any[]) {
-    const sockets = this.io.sockets;
     const io = this.io;
     const { role, userName, _id } = client.user;
-    const loggedUsers = ['64d129d7d6c789a6d4b8ebdc'];
 
     this.logger.log(`Client conneted, id = ${client.id}`);
     if (matchRoles([UsersRole.ADMIN, UsersRole.MANAGER], role)) {
@@ -56,29 +56,25 @@ export class Gateway
         OrderStatus.SELECTED,
       ].forEach(async (room) => {
         await client.join(room);
-        io.to(room).emit('room_in', `#${room}# Welcome ${userName}`);
+        io.to(room).emit('joinRoom', `#${room}# Welcome ${userName}`);
       });
     }
     if (matchRoles([UsersRole.DRIVER], role)) {
       await client.join(OrderStatus.OPEN);
       io.to(OrderStatus.OPEN).emit(
-        'room_in',
+        'joinRoom',
         `#${OrderStatus.OPEN}# Welcome ${userName}`,
       );
       [OrderStatus.DONE, OrderStatus.PENDING, OrderStatus.SELECTED].forEach(
         async (room) => {
           await client.join(`${room}_${_id}`);
           io.to(`${room}_${_id}`).emit(
-            'room_in',
+            'joinRoom',
             `#${room}_${_id}# Welcome ${userName}`,
           );
         },
       );
     }
-
-    //  this.logger.debug(`Number of connected sockets: ${sockets.size}`);
-
-    //this.io.emit('room_in', `Welcome ${userName}`);
   }
   handleDisconnect(client: Socket) {
     const sockets = this.io.sockets;
@@ -143,6 +139,38 @@ export class Gateway
     if (matchRoles([UsersRole.DRIVER], role)) {
       this.io.to(status).emit(ActionMesseges.CREATE_ORDER, result);
       //this.io.to(status).emit(`${ActionMesseges.CREATE_ORDER}}`, result);
+    }
+  }
+
+  @UseFilters(new WsAndHttpExceptionFilter())
+  @SubscribeMessage(ActionMesseges.DELETE_ORDER)
+  async deleteOrder(
+    @MessageBody(ValidationPipe) data: DeleteOrderDto,
+    @ConnectedSocket() client: Socket & WsUser,
+  ) {
+    console.log('deleting');
+    const { role } = client.user;
+    const result = await this.ordersService.deleteOrder(data.id);
+    const {
+      status: code,
+      message,
+      deleted: { selectedBy, status, _id },
+    } = result;
+
+    const dataToSendBack = {
+      statusCode: code,
+      message,
+      _id,
+      status,
+      selectedBy,
+    };
+    if (matchRoles([UsersRole.ADMIN, UsersRole.MANAGER], role)) {
+      if (selectedBy) {
+        this.io
+          .to(`${status}_${selectedBy}`)
+          .emit(`${ActionMesseges.DELETE_ORDER}`, dataToSendBack);
+      }
+      this.io.to(status).emit(ActionMesseges.DELETE_ORDER, dataToSendBack);
     }
   }
 }
