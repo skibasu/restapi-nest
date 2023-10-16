@@ -2,15 +2,19 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsDefined,
   IsEnum,
   IsMongoId,
   IsObject,
   IsOptional,
   IsString,
-  Validate,
+  ValidateIf,
+  ValidateNested,
 } from 'class-validator';
-import { IsMongoIdOrNull } from 'src/users/validators/isMongoIdOrNull';
-import { OrderStatus, PaymentType } from '../types/orders.types';
+
+import { OrderStatus, PaymentType, Product } from '../types/orders.types';
+import { Type } from 'class-transformer';
+import { CreateOrderDtoProduct } from './create-order-dto';
 class PatchOrderDtoAdress {
   @IsOptional()
   streetName: string;
@@ -21,6 +25,7 @@ class PatchOrderDtoAdress {
   @IsOptional()
   city: string;
 }
+
 export class PatchOrderDto {
   @IsOptional()
   @IsString()
@@ -33,9 +38,11 @@ export class PatchOrderDto {
   phoneNumber: string;
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
   @ArrayMinSize(1)
-  products: string[];
+  @ValidateNested()
+  @IsObject({ each: true })
+  @Type(() => CreateOrderDtoProduct)
+  products: Product[];
   @IsOptional()
   @IsString()
   price: string;
@@ -45,8 +52,8 @@ export class PatchOrderDto {
   @IsOptional()
   @IsEnum(OrderStatus)
   status: OrderStatus;
-  @IsOptional()
-  @Validate(IsMongoIdOrNull)
+  @ValidateIf(({ status }) => status === OrderStatus.SELECTED)
+  @IsMongoId()
   selectedBy: string;
 }
 
@@ -63,10 +70,12 @@ export class WSPatchOrderDto {
   @IsString()
   phoneNumber: string;
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsDefined()
   @ArrayMinSize(1)
-  products: string[];
+  @ValidateNested()
+  @IsObject({ each: true })
+  @Type(() => CreateOrderDtoProduct)
+  products: Product[];
   @IsOptional()
   @IsString()
   price: string;
@@ -76,7 +85,7 @@ export class WSPatchOrderDto {
   @IsOptional()
   @IsEnum(OrderStatus)
   status: OrderStatus;
-  @IsOptional()
-  @Validate(IsMongoIdOrNull)
+  @ValidateIf(({ status }) => status === OrderStatus.SELECTED)
+  @IsMongoId()
   selectedBy: string;
 }

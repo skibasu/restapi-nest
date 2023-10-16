@@ -5,15 +5,26 @@ import {
   IsOptional,
   IsString,
   IsObject,
-  IsArray,
   ArrayMinSize,
   IsMongoId,
   IsDefined,
   IsNotEmptyObject,
   ValidateNested,
+  IsNumber,
+  IsUrl,
+  IsEnum,
+  Min,
+  IsArray,
+  ValidateIf,
 } from 'class-validator';
-import { OrderStatus, PaymentType } from '../types/orders.types';
+import {
+  MenuProductType,
+  OrderStatus,
+  PaymentType,
+  Product,
+} from '../types/orders.types';
 import { Type } from 'class-transformer';
+import { isNull } from 'util';
 export class CreateOrderDtoAdress {
   @IsNotEmpty()
   @IsString()
@@ -31,6 +42,32 @@ export class CreateOrderDtoAdress {
   @IsString()
   note: string;
 }
+
+export class CreateOrderDtoProduct {
+  @IsNotEmpty()
+  @IsMongoId()
+  _id: string;
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+  @IsUrl()
+  @IsString()
+  picture: string;
+  @IsNotEmpty()
+  @IsEnum(MenuProductType)
+  type: MenuProductType;
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
+  counter: number;
+}
+
 export class CreateOrderDto {
   @IsNotEmpty()
   @IsString()
@@ -45,19 +82,20 @@ export class CreateOrderDto {
   @IsString()
   phoneNumber: string;
   @IsArray()
-  @IsString({ each: true })
   @ArrayMinSize(1)
-  products: string[];
+  @ValidateNested()
+  @IsObject({ each: true })
+  @Type(() => CreateOrderDtoProduct)
+  products: Product[];
   @IsNotEmpty()
   @IsString()
   price: string;
   @IsNotEmpty()
   @IsString()
   paymentType: PaymentType;
-  @IsOptional()
+  @ValidateIf(({ status }) => status === OrderStatus.SELECTED)
   @IsMongoId()
   selectedBy: string;
-  @IsOptional()
   @IsIn([OrderStatus.DRAFT, OrderStatus.OPEN, OrderStatus.SELECTED])
   status: OrderStatus.DRAFT | OrderStatus.OPEN | OrderStatus.SELECTED;
 }
