@@ -88,8 +88,8 @@ export class CreateOrderDto {
   @Type(() => CreateOrderDtoProduct)
   products: Product[];
   @IsNotEmpty()
-  @IsString()
-  price: string;
+  @IsNumber()
+  price: number;
   @IsNotEmpty()
   @IsString()
   paymentType: PaymentType;

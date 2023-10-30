@@ -23,6 +23,7 @@ export class OrdersService {
     try {
       const result = await this.orderModel
         .find(filters)
+        .sort({ createdAt: -1 })
         .select({ __v: 0 })
         .populate({
           path: 'selectedBy addedBy acceptedBy',

@@ -61,8 +61,8 @@ export class Order {
   products: Product[];
   @Prop({ type: String, required: true })
   phoneNumber: string;
-  @Prop({ type: String, required: true })
-  price: string;
+  @Prop({ type: Number, required: true })
+  price: number;
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
   paymentType: PaymentType;
   @Prop({ type: mongoose.Schema.Types.ObjectId, required: false, ref: 'User' })

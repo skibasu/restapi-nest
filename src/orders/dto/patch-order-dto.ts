@@ -5,6 +5,7 @@ import {
   IsDefined,
   IsEnum,
   IsMongoId,
+  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -44,8 +45,8 @@ export class PatchOrderDto {
   @Type(() => CreateOrderDtoProduct)
   products: Product[];
   @IsOptional()
-  @IsString()
-  price: string;
+  @IsNumber()
+  price: number;
   @IsOptional()
   @IsString()
   paymentType: PaymentType;
@@ -77,8 +78,8 @@ export class WSPatchOrderDto {
   @Type(() => CreateOrderDtoProduct)
   products: Product[];
   @IsOptional()
-  @IsString()
-  price: string;
+  @IsNumber()
+  price: number;
   @IsOptional()
   @IsString()
   paymentType: PaymentType;
