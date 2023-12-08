@@ -1,5 +1,5 @@
 import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Socket, Server, Namespace } from 'socket.io';
+import { Socket, Namespace } from 'socket.io';
 import {
   ConnectedSocket,
   MessageBody,
@@ -122,7 +122,6 @@ export class Gateway
     @MessageBody(ValidationPipe) data: CreateOrderDto,
     @ConnectedSocket() client: Socket & WsUser,
   ) {
-    console.log('CREATE ORDER');
     const { role } = client.user;
     const { selectedBy } = data;
     const result = await this.ordersService.createOrder(data, client.user);
@@ -148,7 +147,6 @@ export class Gateway
     @MessageBody(ValidationPipe) data: DeleteOrderDto,
     @ConnectedSocket() client: Socket & WsUser,
   ) {
-    console.log('deleting');
     const { role } = client.user;
     const result = await this.ordersService.deleteOrder(data.id);
     const {

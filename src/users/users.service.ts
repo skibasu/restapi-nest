@@ -18,10 +18,19 @@ export class UsersService {
   async getUserByID(id: string): Promise<User> {
     return this.userModel
       .findById(id)
-      .select({ __v: 0, password: 0, salt: 0 })
+      .select({ __v: 0, password: 0, salt: 0, refreshToken: 0 })
       .exec();
   }
 
+  async getUserSaltAndTokenByUserID(id: string): Promise<Partial<User>> {
+    const user = await this.userModel
+      .findOne(
+        { _id: id },
+        { salt: 1, refreshToken: 1, _id: 1, firstName: 1, role: 1 },
+      )
+      .exec();
+    return user;
+  }
   async creatUser(user: Partial<User>) {
     const newUser = new this.userModel(user);
     const result = await newUser.save();
@@ -36,7 +45,7 @@ export class UsersService {
     const filters = filterDto && filterDto.length ? { $and: filterDto } : {};
     const result = await this.userModel
       .find(filters)
-      .select({ __v: 0, password: 0, salt: 0 })
+      .select({ __v: 0, password: 0, salt: 0, refreshToken: 0 })
       .exec();
     if (result.length === 0 || !result) {
       throw new NotFoundException('Not found.');
@@ -44,6 +53,28 @@ export class UsersService {
     return result;
   }
 
+  async updateUserRefreshToken(
+    _id: string,
+    token: string | null,
+    validateToken = false,
+  ) {
+    const search = validateToken ? { _id } : { _id };
+    try {
+      const result = await this.userModel
+        .findOneAndUpdate(search, { refreshToken: token })
+        .exec();
+
+      if (!result) {
+        throw new NotFoundException('User not exist');
+      }
+      return;
+    } catch (error: any) {
+      const exception = validateToken
+        ? new NotFoundException(`User is log out`)
+        : new NotFoundException(`User with not exist`);
+      throw exception;
+    }
+  }
   async updateUser(_id: string, user: Partial<User>): Promise<User> {
     if (user?.email || user?.phoneNumber) {
       const { conflict, message } = await this.checkIfUserIsUnique({
@@ -59,7 +90,7 @@ export class UsersService {
         .findOneAndUpdate({ _id }, user, {
           returnOriginal: false,
         })
-        .select({ __v: 0, password: 0, salt: 0 })
+        .select({ __v: 0, password: 0, salt: 0, refreshToken: 0 })
         .exec();
       return result;
     } catch (error: any) {

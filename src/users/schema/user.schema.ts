@@ -53,6 +53,12 @@ export class User {
     matches: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
   })
   salt: string;
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+    required: false,
+    default: null,
+  })
+  refreshToken: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
