@@ -8,6 +8,7 @@ import { RolesGuard } from './auth/quards/roles.quard';
 import { HttpExceptionFilter } from './filters/http-exceptions.filter';
 import { SocketIOAdapter } from './socket-io-adapter';
 import { AtGuard } from './auth/quards/at.guard';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   //   const httpsOptions = {
@@ -16,8 +17,11 @@ async function bootstrap() {
   //   };
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: '*',
+    credentials: true,
+    origin: 'http://localhost:3001',
   });
+  app.use(cookieParser());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

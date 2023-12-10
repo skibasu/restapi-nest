@@ -12,6 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import { roleToUpperCase } from 'src/users/helpers/helpers';
 import { jwtConstants } from './constants/constants';
 import { Tokens } from 'src/orders/types/auth-types';
+import { Response as IResponse } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 const message = 'Bad credentials';
 @Injectable()
@@ -19,11 +21,13 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async signIn(
     userCredentialsDto: UserCredentialsDto,
-  ): Promise<{ token: Tokens; _id: string }> {
+    res: IResponse,
+  ): Promise<{ _id: string; token: Tokens }> {
     const { email, password } = userCredentialsDto;
     const user = await this.usersService.getUserByEmail(email);
 
@@ -40,9 +44,25 @@ export class AuthService {
     if (hash === user.password) {
       const token = await this.getTokens(payload);
       await this.updateRefreshToken(user._id, token.refreshToken);
+      res.cookie('access_token', token.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 60 * 60 * 12,
+      });
+      res.cookie('refresh_token', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 60 * 60 * 12,
+      });
+      res.cookie('_id', user._id);
       return {
         _id: user._id,
-        token: await this.getTokens(payload),
+        token: {
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken,
+        },
       };
     }
     throw new UnauthorizedException(message);
@@ -73,7 +93,7 @@ export class AuthService {
     return { message: 'Logout' };
   }
 
-  async refreshToken(userId: string, refreshToken: string) {
+  async refreshToken(userId: string, refreshToken: string, res: IResponse) {
     const user = await this.usersService.getUserSaltAndTokenByUserID(userId);
 
     if (!user) {
@@ -90,7 +110,19 @@ export class AuthService {
     } else {
       const token = await this.getTokens(payload);
       await this.updateRefreshToken(user._id, token.refreshToken);
-      return token;
+      res.cookie('access_token', token.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 60 * 60 * 12,
+      });
+      res.cookie('refresh_token', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 60 * 60 * 12,
+      });
+      return { message: 'refreshed' };
     }
   }
 
@@ -106,11 +138,11 @@ export class AuthService {
   private async getTokens(payload: any): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 60,
+        expiresIn: this.configService.get<string>('TOKEN_EXPIRED_TIME'),
         secret: jwtConstants.secret,
       }),
       await this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 60 * 12,
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME'),
         secret: jwtConstants.refreshSecret,
       }),
     ]);

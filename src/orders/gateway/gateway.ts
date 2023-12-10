@@ -28,7 +28,9 @@ enum ActionMesseges {
 }
 
 @UsePipes(ValidationPipe)
-@WebSocketGateway({ namespace: 'orders', cors: true, origin: '*' })
+@WebSocketGateway({
+  namespace: 'orders',
+})
 export class Gateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -48,6 +50,7 @@ export class Gateway
 
     this.logger.log(`Client conneted, id = ${client.id}`);
     if (matchRoles([UsersRole.ADMIN, UsersRole.MANAGER], role)) {
+      console.log('Match role');
       [
         OrderStatus.DONE,
         OrderStatus.DRAFT,
@@ -147,6 +150,7 @@ export class Gateway
     @MessageBody(ValidationPipe) data: DeleteOrderDto,
     @ConnectedSocket() client: Socket & WsUser,
   ) {
+    console.log('deleting');
     const { role } = client.user;
     const result = await this.ordersService.deleteOrder(data.id);
     const {
@@ -154,7 +158,7 @@ export class Gateway
       message,
       deleted: { selectedBy, status, _id },
     } = result;
-
+    console.log('deleting result', result);
     const dataToSendBack = {
       statusCode: code,
       message,

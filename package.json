@@ -30,6 +30,7 @@
     "@nestjs/platform-socket.io": "^10.2.1",
     "@nestjs/websockets": "^10.2.1",
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.6",
     "cookie-parser": "^1.4.6",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
