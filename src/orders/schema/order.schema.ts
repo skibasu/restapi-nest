@@ -42,7 +42,7 @@ export class Product {
   counter: number;
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Order {
   _id: string;
   @Prop({
@@ -78,10 +78,10 @@ export class Order {
     default: null,
   })
   selectedBy: User | null;
-  @Prop({ type: Number, required: false, default: new Date().getTime() })
-  createdAt: number;
   @Prop({ type: Date, required: false })
-  updatedAt: Date;
+  createdAt?: number;
+  @Prop({ type: Date, required: false })
+  updatedAt?: Date;
   @Prop({ type: Date, required: false })
   deletedAt: Date;
 }

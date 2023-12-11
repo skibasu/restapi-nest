@@ -27,7 +27,9 @@ export class AuthService {
   async signIn(
     userCredentialsDto: UserCredentialsDto,
     res: IResponse,
-  ): Promise<{ _id: string; token: Tokens }> {
+  ): Promise<{
+    message: string /*timeOut: { token: number; refresh: number }*/;
+  }> {
     const { email, password } = userCredentialsDto;
     const user = await this.usersService.getUserByEmail(email);
 
@@ -48,21 +50,42 @@ export class AuthService {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: 60 * 60 * 12,
+        maxAge:
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
       });
       res.cookie('refresh_token', token.refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: 60 * 60 * 12,
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
       });
-      res.cookie('_id', user._id);
+      res.cookie('_id', user._id.toString());
+      res.cookie(
+        'token',
+        new Date().getTime() +
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')),
+      );
+      res.cookie(
+        'refresh',
+        new Date().getTime() +
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')),
+      );
       return {
-        _id: user._id,
-        token: {
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
-        },
+        message: 'Successed',
+        //   timeOut: {
+        //     token:
+        //       new Date().getTime() +
+        //       Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')),
+
+        //     refresh:
+        //       new Date().getTime() +
+        //       Number(
+        //         this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME'),
+        //       ),
+        //   },
       };
     }
     throw new UnauthorizedException(message);
@@ -88,12 +111,30 @@ export class AuthService {
     return { message: 'User created' };
   }
 
-  async logOut(userId: string) {
+  async logOut(userId: string, res: IResponse) {
     await this.deleteRefreshToken(userId);
+
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: -1000,
+    });
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: -1000,
+    });
+    res.cookie('_id', '', { maxAge: -1000 });
     return { message: 'Logout' };
   }
 
-  async refreshToken(userId: string, refreshToken: string, res: IResponse) {
+  async refreshToken(
+    userId: string,
+    refreshToken: string,
+    res: IResponse,
+  ): Promise<{ message: string }> {
     const user = await this.usersService.getUserSaltAndTokenByUserID(userId);
 
     if (!user) {
@@ -114,15 +155,40 @@ export class AuthService {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: 60 * 60 * 12,
+        maxAge:
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
       });
       res.cookie('refresh_token', token.refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: 60 * 60 * 12,
+        maxAge: Number(
+          this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME') +
+            Number(this.configService.get<string>('TIME_OFFSET')),
+        ),
       });
-      return { message: 'refreshed' };
+      res.cookie('_id', user._id.toString(), {
+        maxAge: Number(
+          this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME') +
+            Number(this.configService.get<string>('TIME_OFFSET')),
+        ),
+      });
+      res.cookie(
+        'token',
+        new Date().getTime() +
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      );
+      res.cookie(
+        'refresh',
+        new Date().getTime() +
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      );
+      return {
+        message: 'refreshed',
+      };
     }
   }
 
@@ -138,11 +204,15 @@ export class AuthService {
   private async getTokens(payload: any): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(payload, {
-        expiresIn: this.configService.get<string>('TOKEN_EXPIRED_TIME'),
+        expiresIn:
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
         secret: jwtConstants.secret,
       }),
       await this.jwtService.signAsync(payload, {
-        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME'),
+        expiresIn:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
         secret: jwtConstants.refreshSecret,
       }),
     ]);

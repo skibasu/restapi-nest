@@ -10,9 +10,7 @@ type JwtPayload = Pick<User, '_id' | 'firstName' | 'email'>;
 export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ]),
+      jwtFromRequest: ExtractJwt.fromExtractors([AtStrategy.extractJWT]),
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secret,
     });
@@ -26,7 +24,6 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
       'access_token' in req.cookies &&
       req.cookies.access_token
     ) {
-      //console.log('ACCES TOKEN AtStrategy', req.cookies.access_token);
       return req.cookies.access_token;
     }
     return null;

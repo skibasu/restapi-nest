@@ -44,9 +44,11 @@ export class AuthController {
   }
   @HttpCode(200)
   @Post('/logout')
-  @UsePipes(ValidationPipe)
-  async logOut(@GetCurrentUser('_id') userId: string) {
-    return this.authService.logOut(userId);
+  async logOut(
+    @GetCurrentUser('_id') userId: string,
+    @Res({ passthrough: true }) res: IResponse,
+  ): Promise<any> {
+    return await this.authService.logOut(userId, res);
   }
   @Public()
   @UseGuards(RtGuard)
@@ -54,7 +56,7 @@ export class AuthController {
   async refreshToken(
     @GetCurrentUser('_id') userId: string,
     @GetCurrentUser('refreshToken') refreshToken: string,
-    @Res() res,
+    @Res({ passthrough: true }) res: IResponse,
   ) {
     return this.authService.refreshToken(userId, refreshToken, res);
   }

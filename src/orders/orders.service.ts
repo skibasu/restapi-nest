@@ -13,10 +13,14 @@ import { CreateOrderDto } from './dto/create-order-dto';
 import { PatchOrderDto } from './dto/patch-order-dto';
 import { Order } from './schema/order.schema';
 import { OrderStatus } from './types/orders.types';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
-  constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
+  constructor(
+    @InjectModel(Order.name) private orderModel: Model<Order>,
+    private configService: ConfigService,
+  ) {}
 
   async getListOfOrders(filterDto?: Partial<Order>[]): Promise<Order[]> {
     const filters = filterDto && filterDto.length ? { $and: filterDto } : {};
@@ -82,7 +86,7 @@ export class OrdersService {
       }
 
       const acceptedBy = isAccepted ? { acceptedBy: addedBy } : {};
-      const createdAt = new Date().getTime();
+
       const newOrder = new this.orderModel({
         ...order,
         ...acceptedBy,
@@ -91,9 +95,8 @@ export class OrdersService {
         isAccepted,
         addedBy,
         status: orderStatus,
-        createdAt,
       });
-
+      console.log('date ', new Date());
       const result = await newOrder.save();
 
       if (!result) {

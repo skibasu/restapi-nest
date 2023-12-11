@@ -44,20 +44,19 @@ export class SocketIOAdapter extends IoAdapter {
 const createTokenMiddleware =
   (jwtService: JwtService, configService: ConfigService, logger: Logger) =>
   async (socket: Socket & WsUser, next: (err?: ExtendedError) => void) => {
-    //  const tokens = socket.handshake.headers.cookie || '';
-    //  const arrOfTokens = tokens.split('; ');
-    //  const accessTokenwithPrefix = arrOfTokens.find((c) =>
-    //    c.match(/^access_token=.*$/),
-    //  );
-    //  const accessToken =
-    //    accessTokenwithPrefix?.replace('access_token=', '') || '';
+    const tokens = socket.handshake.headers.cookie || '';
+    const arrOfTokens = tokens.split('; ');
+    const accessTokenWithPrefix = arrOfTokens.find((c) =>
+      c.match(/^access_token=.*$/),
+    );
 
     const accessToken =
-      socket.handshake.auth.token || socket.handshake.headers['token'];
+      accessTokenWithPrefix?.replace('access_token=', '') || '';
+
     const secret = configService.get('SECRET');
 
     logger.debug(`Validating token ${accessToken} before connection`);
-
+    logger.debug(`Credentials ${accessToken} `);
     try {
       const { _id, userName, role } = await jwtService.verifyAsync(
         accessToken,
