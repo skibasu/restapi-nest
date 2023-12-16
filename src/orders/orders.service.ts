@@ -96,7 +96,7 @@ export class OrdersService {
         addedBy,
         status: orderStatus,
       });
-      console.log('date ', new Date());
+
       const result = await newOrder.save();
 
       if (!result) {

@@ -8,6 +8,12 @@ import {
 import { User } from 'src/users/schema/user.schema';
 
 @Schema()
+export class PhoneNumber {
+  @Prop({ type: String, required: true })
+  prefix: string;
+  @Prop({ type: String, required: true })
+  number: string;
+}
 export class Adress {
   @Prop({ type: String, required: true })
   streetName: string;
@@ -59,8 +65,8 @@ export class Order {
   title: string;
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
   products: Product[];
-  @Prop({ type: String, required: true })
-  phoneNumber: string;
+  @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
+  phoneNumber: PhoneNumber;
   @Prop({ type: Number, required: true })
   price: number;
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })

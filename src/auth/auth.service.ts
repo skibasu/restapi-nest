@@ -62,7 +62,11 @@ export class AuthService {
           Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
           Number(this.configService.get<string>('TIME_OFFSET')),
       });
-      res.cookie('_id', user._id.toString());
+      res.cookie('_id', user._id.toString(), {
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
       res.cookie(
         'token',
         new Date().getTime() +
@@ -154,28 +158,24 @@ export class AuthService {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: Number(
-          this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME') +
-            Number(this.configService.get<string>('TIME_OFFSET')),
-        ),
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
       });
       res.cookie('_id', user._id.toString(), {
-        maxAge: Number(
-          this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME') +
-            Number(this.configService.get<string>('TIME_OFFSET')),
-        ),
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
       });
       res.cookie(
         'token',
         new Date().getTime() +
-          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
-          Number(this.configService.get<string>('TIME_OFFSET')),
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')),
       );
       res.cookie(
         'refresh',
         new Date().getTime() +
-          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
-          Number(this.configService.get<string>('TIME_OFFSET')),
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')),
       );
       return {
         message: 'refreshed',
