@@ -19,8 +19,6 @@ import { ProductsModule } from './products/products.module';
     }),
     JwtModule.register({
       global: true,
-      //secret: jwtConstants.secret,
-      // signOptions: { expiresIn: 3600 },
     }),
     AuthModule,
     UsersModule,
