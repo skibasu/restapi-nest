@@ -28,7 +28,11 @@ enum ActionMesseges {
 }
 
 @UsePipes(ValidationPipe)
-@WebSocketGateway({ namespace: 'orders', cors: true, origin: '*' })
+@WebSocketGateway({
+  namespace: 'orders',
+  credentials: true,
+  origin: 'http://localhost:3001',
+})
 export class Gateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

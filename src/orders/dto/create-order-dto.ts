@@ -16,6 +16,8 @@ import {
   Min,
   IsArray,
   ValidateIf,
+  IsNumberString,
+  Matches,
 } from 'class-validator';
 import {
   MenuProductType,
@@ -42,7 +44,14 @@ export class CreateOrderDtoAdress {
   @IsString()
   note: string;
 }
-
+export class CreateOrderDtoPhoneNumber {
+  @IsNotEmpty()
+  @IsNumberString()
+  number: string;
+  @IsString()
+  @Matches(/^\+\d*$/)
+  prefix: string;
+}
 export class CreateOrderDtoProduct {
   @IsNotEmpty()
   @IsMongoId()
@@ -78,9 +87,12 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => CreateOrderDtoAdress)
   adress: CreateOrderDtoAdress;
-  @IsNotEmpty()
-  @IsString()
-  phoneNumber: string;
+  @IsDefined()
+  @IsNotEmptyObject()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateOrderDtoPhoneNumber)
+  phoneNumber: CreateOrderDtoPhoneNumber;
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested()

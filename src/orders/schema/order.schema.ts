@@ -8,6 +8,12 @@ import {
 import { User } from 'src/users/schema/user.schema';
 
 @Schema()
+export class PhoneNumber {
+  @Prop({ type: String, required: true })
+  prefix: string;
+  @Prop({ type: String, required: true })
+  number: string;
+}
 export class Adress {
   @Prop({ type: String, required: true })
   streetName: string;
@@ -42,7 +48,7 @@ export class Product {
   counter: number;
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Order {
   _id: string;
   @Prop({
@@ -59,8 +65,8 @@ export class Order {
   title: string;
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
   products: Product[];
-  @Prop({ type: String, required: true })
-  phoneNumber: string;
+  @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
+  phoneNumber: PhoneNumber;
   @Prop({ type: Number, required: true })
   price: number;
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
@@ -78,10 +84,10 @@ export class Order {
     default: null,
   })
   selectedBy: User | null;
-  @Prop({ type: Number, required: false, default: new Date().getTime() })
-  createdAt: number;
   @Prop({ type: Date, required: false })
-  updatedAt: Date;
+  createdAt?: number;
+  @Prop({ type: Date, required: false })
+  updatedAt?: Date;
   @Prop({ type: Date, required: false })
   deletedAt: Date;
 }

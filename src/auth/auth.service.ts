@@ -12,6 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import { roleToUpperCase } from 'src/users/helpers/helpers';
 import { jwtConstants } from './constants/constants';
 import { Tokens } from 'src/orders/types/auth-types';
+import { Response as IResponse } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 const message = 'Bad credentials';
 @Injectable()
@@ -19,11 +21,15 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async signIn(
     userCredentialsDto: UserCredentialsDto,
-  ): Promise<{ token: Tokens; _id: string }> {
+    res: IResponse,
+  ): Promise<{
+    message: string /*timeOut: { token: number; refresh: number }*/;
+  }> {
     const { email, password } = userCredentialsDto;
     const user = await this.usersService.getUserByEmail(email);
 
@@ -40,9 +46,39 @@ export class AuthService {
     if (hash === user.password) {
       const token = await this.getTokens(payload);
       await this.updateRefreshToken(user._id, token.refreshToken);
+      res.cookie('access_token', token.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge:
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
+      res.cookie('refresh_token', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
+      res.cookie('_id', user._id.toString(), {
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
+      res.cookie(
+        'token',
+        new Date().getTime() +
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')),
+      );
+      res.cookie(
+        'refresh',
+        new Date().getTime() +
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')),
+      );
       return {
-        _id: user._id,
-        token: await this.getTokens(payload),
+        message: 'Successed',
       };
     }
     throw new UnauthorizedException(message);
@@ -68,12 +104,32 @@ export class AuthService {
     return { message: 'User created' };
   }
 
-  async logOut(userId: string) {
+  async logOut(userId: string, res: IResponse) {
     await this.deleteRefreshToken(userId);
+
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: -1000,
+    });
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: -1000,
+    });
+    res.cookie('_id', '', { maxAge: -1000 });
+    res.cookie('token', '', { maxAge: -1000 });
+    res.cookie('refresh', '', { maxAge: -1000 });
     return { message: 'Logout' };
   }
 
-  async refreshToken(userId: string, refreshToken: string) {
+  async refreshToken(
+    userId: string,
+    refreshToken: string,
+    res: IResponse,
+  ): Promise<{ message: string }> {
     const user = await this.usersService.getUserSaltAndTokenByUserID(userId);
 
     if (!user) {
@@ -90,7 +146,40 @@ export class AuthService {
     } else {
       const token = await this.getTokens(payload);
       await this.updateRefreshToken(user._id, token.refreshToken);
-      return token;
+      res.cookie('access_token', token.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge:
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
+      res.cookie('refresh_token', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
+      res.cookie('_id', user._id.toString(), {
+        maxAge:
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')) +
+          Number(this.configService.get<string>('TIME_OFFSET')),
+      });
+      res.cookie(
+        'token',
+        new Date().getTime() +
+          Number(this.configService.get<string>('TOKEN_EXPIRED_TIME')),
+      );
+      res.cookie(
+        'refresh',
+        new Date().getTime() +
+          Number(this.configService.get<string>('REFRESH_TOKEN_EXPIRED_TIME')),
+      );
+      return {
+        message: 'refreshed',
+      };
     }
   }
 
@@ -106,11 +195,15 @@ export class AuthService {
   private async getTokens(payload: any): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 60,
+        expiresIn: this.configService.get<string>('TOKEN_EXPIRED_TIME_IN'),
+
         secret: jwtConstants.secret,
       }),
       await this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 60 * 12,
+        expiresIn: this.configService.get<string>(
+          'REFRESH_TOKEN_EXPIRED_TIME_IN',
+        ),
+
         secret: jwtConstants.refreshSecret,
       }),
     ]);

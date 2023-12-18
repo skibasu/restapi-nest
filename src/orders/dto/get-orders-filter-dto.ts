@@ -10,6 +10,13 @@ class GetOrdersFilterDtoAdress {
   @IsOptional()
   city: string;
 }
+
+export class GetOrderDtoPhoneNumber {
+  @IsOptional()
+  number: string;
+  @IsOptional()
+  prefix: string;
+}
 export class GetOrdersFilterDto {
   @IsOptional()
   status: OrderStatus;
@@ -19,7 +26,7 @@ export class GetOrdersFilterDto {
   @IsObject()
   adress: GetOrdersFilterDtoAdress;
   @IsOptional()
-  phoneNumber: string;
+  phoneNumber: GetOrderDtoPhoneNumber;
   @IsOptional()
   price: string;
   @IsOptional()

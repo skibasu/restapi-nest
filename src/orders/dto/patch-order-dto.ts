@@ -27,6 +27,12 @@ class PatchOrderDtoAdress {
   city: string;
 }
 
+export class PatchOrderDtoPhoneNumber {
+  @IsOptional()
+  number: string;
+  @IsOptional()
+  prefix: string;
+}
 export class PatchOrderDto {
   @IsOptional()
   @IsString()
@@ -35,8 +41,8 @@ export class PatchOrderDto {
   @IsObject()
   adress: PatchOrderDtoAdress;
   @IsOptional()
-  @IsString()
-  phoneNumber: string;
+  @Type(() => PatchOrderDtoPhoneNumber)
+  phoneNumber: PatchOrderDtoPhoneNumber;
   @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
@@ -68,8 +74,8 @@ export class WSPatchOrderDto {
   @IsObject()
   adress: PatchOrderDtoAdress;
   @IsOptional()
-  @IsString()
-  phoneNumber: string;
+  @Type(() => PatchOrderDtoPhoneNumber)
+  phoneNumber: PatchOrderDtoPhoneNumber;
   @IsOptional()
   @IsDefined()
   @ArrayMinSize(1)

@@ -3,9 +3,12 @@ import {
   Controller,
   HttpCode,
   Post,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Get,
+  Res,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersRole } from 'src/users/types/users-types';
@@ -15,6 +18,7 @@ import { Roles } from './decorators/roles.decorator';
 import { Public } from './decorators/public.decorator';
 import { GetCurrentUser } from './decorators/get-current-user';
 import { RtGuard } from './quards/rt.guard';
+import { Response as IResponse, Request as IRequest } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -23,9 +27,13 @@ export class AuthController {
   @Public()
   @Post('/signin')
   @UsePipes(ValidationPipe)
-  async signIn(@Body() userCredential: UserCredentialsDto): Promise<any> {
+  async signIn(
+    @Body() userCredential: UserCredentialsDto,
+    @Res({ passthrough: true }) res: IResponse,
+  ): Promise<any> {
     const { email, password } = userCredential;
-    return this.authService.signIn({ email, password });
+
+    return this.authService.signIn({ email, password }, res);
   }
 
   @Post('/signup')
@@ -36,17 +44,20 @@ export class AuthController {
   }
   @HttpCode(200)
   @Post('/logout')
-  @UsePipes(ValidationPipe)
-  async logOut(@GetCurrentUser('_id') userId: string) {
-    return this.authService.logOut(userId);
+  async logOut(
+    @GetCurrentUser('_id') userId: string,
+    @Res({ passthrough: true }) res: IResponse,
+  ): Promise<any> {
+    return await this.authService.logOut(userId, res);
   }
   @Public()
   @UseGuards(RtGuard)
-  @Post('/refresh')
+  @Get('/refresh')
   async refreshToken(
     @GetCurrentUser('_id') userId: string,
     @GetCurrentUser('refreshToken') refreshToken: string,
+    @Res({ passthrough: true }) res: IResponse,
   ) {
-    return this.authService.refreshToken(userId, refreshToken);
+    return this.authService.refreshToken(userId, refreshToken, res);
   }
 }

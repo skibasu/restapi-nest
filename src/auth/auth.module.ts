@@ -5,9 +5,10 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { AtStrategy } from './strategies/at.strategy';
 import { RtStrategy } from './strategies/rt.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, PassportModule],
+  imports: [UsersModule, PassportModule, ConfigModule],
   controllers: [AuthController],
   providers: [AuthService, AtStrategy, RtStrategy],
 })
