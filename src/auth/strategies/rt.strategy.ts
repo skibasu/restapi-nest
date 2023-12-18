@@ -1,16 +1,16 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { jwtConstants } from '../constants/constants';
 import { Request as IRequest } from 'express';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor() {
+  constructor(protected configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([RtStrategy.extractJWT]),
       ignoreExpiration: false,
-      secretOrKey: jwtConstants.refreshSecret,
+      secretOrKey: configService.get<string>('SECRET'),
       passReqToCallback: true,
     });
   }
@@ -28,8 +28,4 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     }
     return null;
   }
-  //   private extractTokenFromHeader(request: IRequest): string | undefined {
-  //     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-  //     return type === 'Bearer' ? token : undefined;
-  //   }
 }

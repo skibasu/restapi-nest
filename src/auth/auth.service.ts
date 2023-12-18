@@ -10,7 +10,6 @@ import { UsersService } from 'src/users/users.service';
 import { UserCredentialsDto } from './dto/user-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
 import { roleToUpperCase } from 'src/users/helpers/helpers';
-import { jwtConstants } from './constants/constants';
 import { Tokens } from 'src/orders/types/auth-types';
 import { Response as IResponse } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -197,14 +196,14 @@ export class AuthService {
       await this.jwtService.signAsync(payload, {
         expiresIn: this.configService.get<string>('TOKEN_EXPIRED_TIME_IN'),
 
-        secret: jwtConstants.secret,
+        secret: this.configService.get<string>('SECRET'),
       }),
       await this.jwtService.signAsync(payload, {
         expiresIn: this.configService.get<string>(
           'REFRESH_TOKEN_EXPIRED_TIME_IN',
         ),
 
-        secret: jwtConstants.refreshSecret,
+        secret: this.configService.get<string>('REFRESH_SECRET'),
       }),
     ]);
     return { accessToken, refreshToken };
