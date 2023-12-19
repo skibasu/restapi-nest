@@ -10,7 +10,7 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([RtStrategy.extractJWT]),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('SECRET'),
+      secretOrKey: configService.get<string>('REFRESH_SECRET'),
       passReqToCallback: true,
     });
   }
