@@ -156,7 +156,7 @@ export class Gateway
     const {
       status: code,
       message,
-      deleted: { selectedBy, status, _id },
+      deleted: { selectedBy, status, _id, title },
     } = result;
 
     const dataToSendBack = {
@@ -165,6 +165,7 @@ export class Gateway
       _id,
       status,
       selectedBy,
+      title,
     };
     if (matchRoles([UsersRole.ADMIN, UsersRole.MANAGER], role)) {
       if (selectedBy) {
