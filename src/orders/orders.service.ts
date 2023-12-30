@@ -134,7 +134,7 @@ export class OrdersService {
   async deleteOrder(_id: string): Promise<{
     status: number;
     message: string;
-    deleted: Pick<Order, '_id' | 'status' | 'selectedBy'>;
+    deleted: Pick<Order, '_id' | 'status' | 'selectedBy' | 'title'>;
   }> {
     try {
       const result = await this.orderModel.findOneAndDelete({ _id }).exec();
@@ -147,6 +147,7 @@ export class OrdersService {
         message: `Order ${_id} deleted`,
         deleted: {
           _id: result._id,
+          title: result.title,
           status: result.status,
           selectedBy: result.selectedBy,
         },
