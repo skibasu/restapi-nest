@@ -14,11 +14,13 @@ import { PatchOrderDto } from './dto/patch-order-dto';
 import { Order } from './schema/order.schema';
 import { OrderStatus } from './types/orders.types';
 import { ConfigService } from '@nestjs/config';
+import { Shift } from 'src/shifts/schema/shifts.schema';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(Shift.name) private shiftModel: Model<Shift>,
     private configService: ConfigService,
   ) {}
 
@@ -98,9 +100,15 @@ export class OrdersService {
       });
 
       const result = await newOrder.save();
+      const result1 = await this.shiftModel.findByIdAndUpdate(order.shiftId, {
+        $push: { orders: newOrder._id },
+      });
 
       if (!result) {
         throw new NotFoundException('Order not saved');
+      }
+      if (!result1) {
+        throw new NotFoundException('Order not saved in Shift');
       }
 
       return await result.populate({

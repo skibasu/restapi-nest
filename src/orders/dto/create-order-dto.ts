@@ -78,6 +78,8 @@ export class CreateOrderDtoProduct {
 }
 
 export class CreateOrderDto {
+  @IsMongoId()
+  shiftId: string;
   @IsNotEmpty()
   @IsString()
   title: string;

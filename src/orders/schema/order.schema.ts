@@ -6,6 +6,7 @@ import {
   PaymentType,
 } from '../types/orders.types';
 import { User } from 'src/users/schema/user.schema';
+import { Shift } from 'src/shifts/schema/shifts.schema';
 
 @Schema()
 export class PhoneNumber {
@@ -51,6 +52,8 @@ export class Product {
 @Schema({ timestamps: true })
 export class Order {
   _id: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shift', required: true })
+  shiftId: Shift['_id'];
   @Prop({
     type: mongoose.Schema.Types.Mixed,
     required: false,
