@@ -17,14 +17,32 @@ export class ShiftsService {
     @InjectModel(Shift.name) private shiftModel: Model<Shift>,
     private configService: ConfigService,
   ) {}
-  async getShifts(isActive: boolean = false) {
+  async getShiftByID(id: string) {
     try {
       const result = await this.shiftModel
-        .find({ isActive })
-        .sort({ createdAt: -1 })
+        .findById(id)
         .select({ __v: 0 })
-        .populate('orders')
+        .populate({ path: 'orders', options: { sort: { createdAt: -1 } } })
         .exec();
+
+      if (!result) {
+        throw new NotFoundException('Not found.');
+      }
+      return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+  async getShifts(isActive = false) {
+    try {
+      const result = isActive
+        ? await this.shiftModel
+            .find({ isActive })
+            .sort({ createdAt: -1 })
+            .select({ __v: 0 })
+            .populate({ path: 'orders', options: { sort: { createdAt: -1 } } })
+            .exec()
+        : await this.shiftModel.find({ isActive }).select('_id title').exec();
       if (result.length === 0 || !result) {
         throw new NotFoundException('Not found.');
       }
